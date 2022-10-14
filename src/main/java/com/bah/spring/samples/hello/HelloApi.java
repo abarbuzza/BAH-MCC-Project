@@ -1,4 +1,4 @@
-package com.webage.spring.samples.hello;
+package com.bah.spring.samples.hello;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
