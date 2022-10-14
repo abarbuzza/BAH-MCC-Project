@@ -1,7 +1,7 @@
-package com.bah.spring.samples.hello.api;
 /*package com.bah.spring.samples.hello.api;
+package com.bah.spring.samples.hello.api;
 
-public package com.webage.api;
+public package com.bah.api;
 
 import java.net.URI;
 import java.util.Optional;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.webage.domain.Customer;
-import com.webage.repository.CustomersRepository;
+import com.bah.domain.Customer;
+import com.bah.repository.CustomersRepository;
 
 @RestController
 @RequestMapping("/customers")
@@ -59,5 +59,4 @@ public class CustomerAPI {
 }
  CustomerAPI {
     
-}
-*/
+}*/
