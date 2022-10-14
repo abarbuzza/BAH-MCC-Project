@@ -34,7 +34,7 @@ public class EventAPI {
     }
 
     @GetMapping("/{eventId}")
-    public EventObj getEventById(@PathVariable("customerId") long id) {
+    public EventObj getEventById(@PathVariable("eventId") long id) {
         EventObj event = null;
         for (int i = 0; i < eventList.size(); i++) {
             if (eventList.get(i).getId() == id) {
