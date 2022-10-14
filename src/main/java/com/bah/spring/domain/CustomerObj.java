@@ -7,9 +7,8 @@ public class CustomerObj {
     String password;
     String email;
 
-
     public CustomerObj() {
-        // TODO Auto-generated constructor stub
+
     }
 
     public CustomerObj(long id, String name, String password, String email) {
