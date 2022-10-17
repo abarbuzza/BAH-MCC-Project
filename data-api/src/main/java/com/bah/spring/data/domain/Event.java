@@ -13,17 +13,10 @@ public class Event {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     long id;
+    @Column(name="EVENT_CODE")
     String code;
     String title;
     String description;
-
-    public Event(long id, String code, String title, String description) {
-        super();
-        this.id = id;
-        this.code = code;
-        this.title = title;
-        this.description = description;
-    }
 
     public long getId() {
         return id;

@@ -41,7 +41,7 @@ public class RegistrationAPI {
 
     @PostMapping
     public ResponseEntity<?> addRegistration(@RequestBody Registration newRegistration, UriComponentsBuilder uri) throws Exception {
-        URI location = uri.build(newRegistration);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newRegistration.getId()).toUri();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
         for (Registration reg:repo.findAll()){
