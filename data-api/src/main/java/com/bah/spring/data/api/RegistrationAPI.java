@@ -1,9 +1,10 @@
 package com.bah.spring.data.api;
 
 import java.net.URI;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bah.spring.data.domain.Registration;
@@ -29,39 +31,49 @@ public class RegistrationAPI {
 
     @GetMapping
     public Iterable<Registration> getAll() {
-        //  Workshop:  Implementation to return existing registrations
-        return null;
+        return repo.findAll();
     }
 
     @GetMapping("/{registrationId}")
     public Optional<Registration> getRegistrationById(@PathVariable("registrationId") long id) {
-        //  Workshop:  Implementation to return a single registration from an ID
-        return null;
+        return repo.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<?> addRegistration(@RequestBody Registration newRegistration, UriComponentsBuilder uri) {
-        //  Workshop:  Implementation to add a new registration; think about data validation and error handling.
-        return null;
+    public ResponseEntity<?> addRegistration(@RequestBody Registration newRegistration, UriComponentsBuilder uri) throws Exception {
+        URI location = uri.build(newRegistration);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(location);
+        for (Registration reg:repo.findAll()){
+            if(reg.getId() == newRegistration.getId()){
+                throw new Exception("Registration already exists.");
+            }
+        }
+        repo.save(newRegistration);
+        return new ResponseEntity<String>(responseHeaders, HttpStatus.CREATED);
     }
 
     @PutMapping("/{eventId}")
     public ResponseEntity<?> putRegistration(
             @RequestBody Registration newRegistration,
-            @PathVariable("eventId") long eventId)
+            @PathVariable("eventId") long eventId) throws Exception
     {
-        // Workshop: Implementation to update an event. Think about error handling.
-        return null;
+        Registration reg = repo.findById(eventId).orElseThrow(() -> new Exception("Registration not found for this event id: " + eventId));
+        reg.setEvent_id(newRegistration.getEvent_id());
+        reg.setCustomer_id(newRegistration.getCustomer_id());
+        reg.setRegistration_date(newRegistration.getRegistration_date());
+        reg.setNotes(newRegistration.getNotes());
+        final Registration updatedRegistration = repo.save(reg);
+        return ResponseEntity.ok(updatedRegistration);
     }
 
     @DeleteMapping("/{eventId}")
-    public ResponseEntity<?> deleteRegistrationById(@PathVariable("eventId") long id) {
-        //  Workshop:  Implementation to delete an event.  For discussion (do not implement unless
-        //  you are sure you have time):  Are there checks you should make to ensure validity of
-        //  data across various entities?  Where should these checks be implemented.  Are there
-        //  advantages and disadvantages to separating data into separate independent entities,
-        //  each with it's own "microservice"?
-        return null;
+    public ResponseEntity<?> deleteRegistrationById(@PathVariable("eventId") long id) throws Exception {
+        Registration reg = repo.findById(id).orElseThrow(() -> new Exception("Registration not found for this event id: \" + eventId"));
+        repo.delete(reg);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(reg);
     }
 
 }
