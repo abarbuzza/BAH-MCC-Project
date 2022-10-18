@@ -2,8 +2,6 @@ package com.bah.spring.data.api;
 
 import java.net.URI;
 import java.util.Optional;
-
-import com.bah.spring.data.domain.Registration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
@@ -48,7 +46,7 @@ public class CustomerAPI {
         //  not null and that no id was passed (it will be auto generated when the record
         //  is inserted.  Remember REST semantics - return a reference to the newly created
         //  entity as a URI.
-        if(newCustomer.getUserName() == null ||
+        if(newCustomer.getName() == null ||
             newCustomer.getEmail() == null ||
             newCustomer.getId() == 0){
             return ResponseEntity.badRequest().build();
@@ -69,9 +67,9 @@ public class CustomerAPI {
         //  With the data model implemented in CustomersRepository, do you need to handle more than
         //  one match per request?
     for(Customer customer: this.getAll()){
-        if(customer.getUserName().equalsIgnoreCase(username)){
+        if(customer.getName().equalsIgnoreCase(username)){
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{username}")
-                    .buildAndExpand(customer.getUserName()).toUri();
+                    .buildAndExpand(customer.getName()).toUri();
             return ResponseEntity.ok(customer);
         }
     }
@@ -85,9 +83,9 @@ public class CustomerAPI {
         //  rather than GET.  You should be able to make use of most of your implmentation for
         //  lookupCustomerByNameGet().
         for(Customer customer: this.getAll()){
-            if(customer.getUserName().equalsIgnoreCase(username)){
+            if(customer.getName().equalsIgnoreCase(username)){
                 URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{username}")
-                        .buildAndExpand(customer.getUserName()).toUri();
+                        .buildAndExpand(customer.getName()).toUri();
                 return ResponseEntity.ok(customer);
             }
         }
@@ -103,7 +101,7 @@ public class CustomerAPI {
         //  requestor specifying the customer ID.  Are there error conditions to be handled?  How much data
         //  validation should you implement considering that customers are stored in a CustomersRepository object.
 
-        if (newCustomer.getId() != customerId || newCustomer.getUserName() == null || newCustomer.getEmail() == null) {
+        if (newCustomer.getId() != customerId || newCustomer.getName() == null || newCustomer.getEmail() == null) {
             return ResponseEntity.badRequest().build();
         }
          repo.save(newCustomer);

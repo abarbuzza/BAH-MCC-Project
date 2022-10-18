@@ -2,12 +2,7 @@ package com.bah.spring.data.domain;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 
 @Entity
@@ -17,6 +12,7 @@ public class Registration {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     Long id;
     String event_id;
+    @Column(name="CUSTOMER_ID")
     String customer_id;
     Date registration_date;
     String notes;

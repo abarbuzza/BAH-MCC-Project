@@ -16,7 +16,7 @@ public class Customer {
     long id;
 
     @Column(name="CUSTOMER_NAME")
-    String username;
+    String name;
     String email;
     String password;
 
@@ -28,12 +28,12 @@ public class Customer {
         this.id = id;
     }
 
-    public String getUserName() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUserName(String name) {
-        this.username = name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
