@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.bah.spring.data.domain.Customer;
 import com.bah.spring.data.domain.Registration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -46,39 +47,44 @@ public class EventAPI {
     public ResponseEntity<?> addEvent(@RequestBody Event newEvent, UriComponentsBuilder uri) throws Exception {
         //  Workshop:  Implement a method to create a new event in response to a POST message.
         //  Think about how you ensure that the event is properly formed.
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newEvent.getId()).toUri();
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setLocation(location);
-        for (Event ev:repo.findAll()){
-            if(ev.getId() == newEvent.getId()){
-                throw new Exception("Event already exists.");
-            }
+        if(newEvent.getCode() == null ||
+                newEvent.getTitle() == null ||
+                newEvent.getId() != 0 || newEvent.getDescription() == null){
+            return ResponseEntity.badRequest().build();
         }
-        repo.save(newEvent);
-        return new ResponseEntity<String>(responseHeaders, HttpStatus.CREATED);    }
+        newEvent = repo.save(newEvent);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(newEvent.getId()).toUri();
+        return ResponseEntity.created(location).build();
+    }
 
     @PutMapping("/{eventId}")
     public ResponseEntity<?> putEvent(
             @RequestBody Event newEvent,
             @PathVariable("eventId") long eventId) throws Exception {
-        Event ev = repo.findById(eventId).orElseThrow(() -> new Exception("Event not found for this id: " + eventId));
-        ev.setId(newEvent.getId());
-        ev.setCode(newEvent.getCode());
-        ev.setDescription(newEvent.getDescription());
-        ev.setTitle(newEvent.getTitle());
-        final Event updatedEvent = repo.save(newEvent);
-        return ResponseEntity.ok(updatedEvent);
+        //  Workshop:  Write an implementation to update or create a new customer with an HTTP PUT, with the
+        //  requestor specifying the customer ID.  Are there error conditions to be handled?  How much data
+        //  validation should you implement considering that customers are stored in a CustomersRepository object.
+
+        if (newEvent.getId() != eventId || newEvent.getDescription() == null || newEvent.getCode() == null || newEvent.getTitle() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        repo.save(newEvent);
+        return ResponseEntity.ok().build();
         //  Workshop:  Implement a method to update an entitye in response to a PUT message.
     }
 
     @DeleteMapping("/{eventId}")
     public ResponseEntity<?> deleteEventById(@PathVariable("eventId") long id) throws Exception {
         //  Workshop:  Implement a method to delete an entity.
-        Event ev = repo.findById(id).orElseThrow(() -> new Exception("Event not found with this event id: " + id));
-        repo.delete(ev);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return ResponseEntity.ok(ev);
+
+        for(Event e: this.getAll()){
+            if(e.getId() == id){
+                repo.delete(e);
+                return ResponseEntity.ok().build();
+            }
+        }
+        return ResponseEntity.badRequest().body("Event not found.");
     }
 
 }

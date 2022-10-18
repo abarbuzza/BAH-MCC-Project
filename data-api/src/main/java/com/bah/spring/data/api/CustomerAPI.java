@@ -48,7 +48,7 @@ public class CustomerAPI {
         //  entity as a URI.
         if(newCustomer.getName() == null ||
             newCustomer.getEmail() == null ||
-            newCustomer.getId() == 0){
+            newCustomer.getId() != 0){
             return ResponseEntity.badRequest().build();
 
         }

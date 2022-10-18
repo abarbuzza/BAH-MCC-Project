@@ -3,6 +3,7 @@ package com.bah.spring.data.api;
 import java.net.URI;
 import java.util.*;
 
+import com.bah.spring.data.domain.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,16 +41,16 @@ public class RegistrationAPI {
 
     @PostMapping
     public ResponseEntity<?> addRegistration(@RequestBody Registration newRegistration, UriComponentsBuilder uri) throws Exception {
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newRegistration.getId()).toUri();
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setLocation(location);
-        for (Registration reg:repo.findAll()){
-            if(reg.getId() == newRegistration.getId()){
-                throw new Exception("Registration already exists.");
-            }
+
+        if(newRegistration.getRegistration_date() == null ||
+                newRegistration.getNotes() == null ||
+                newRegistration.getId() != 0 || newRegistration.getCustomer_id() == null || newRegistration.getEvent_id() == null){
+            return ResponseEntity.badRequest().build();
         }
-        repo.save(newRegistration);
-        return new ResponseEntity<String>(responseHeaders, HttpStatus.CREATED);
+        newRegistration = repo.save(newRegistration);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(newRegistration.getId()).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/{eventId}")
@@ -57,22 +58,24 @@ public class RegistrationAPI {
             @RequestBody Registration newRegistration,
             @PathVariable("eventId") long eventId) throws Exception
     {
-        Registration reg = repo.findById(eventId).orElseThrow(() -> new Exception("Registration not found for this event id: " + eventId));
-        reg.setEvent_id(newRegistration.getEvent_id());
-        reg.setCustomer_id(newRegistration.getCustomer_id());
-        reg.setRegistration_date(newRegistration.getRegistration_date());
-        reg.setNotes(newRegistration.getNotes());
-        final Registration updatedRegistration = repo.save(reg);
-        return ResponseEntity.ok(updatedRegistration);
+        if(newRegistration.getRegistration_date() == null ||
+                newRegistration.getNotes() == null ||
+                newRegistration.getId() == 0 || newRegistration.getCustomer_id() == null || newRegistration.getEvent_id() == null){
+            return ResponseEntity.badRequest().build();
+        }
+        repo.save(newRegistration);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{eventId}")
     public ResponseEntity<?> deleteRegistrationById(@PathVariable("eventId") long id) throws Exception {
-        Registration reg = repo.findById(id).orElseThrow(() -> new Exception("Registration not found for this event id: \" + eventId"));
-        repo.delete(reg);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return ResponseEntity.ok(reg);
+        for(Registration r: this.getAll()){
+            if(r.getId() == id){
+                repo.delete(r);
+                return ResponseEntity.ok().build();
+            }
+        }
+        return ResponseEntity.badRequest().body("Event not found.");
     }
 
 }
